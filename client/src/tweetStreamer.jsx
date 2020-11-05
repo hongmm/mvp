@@ -57,18 +57,29 @@ const TweetStreamer = (props) => {
     axios.post('/api/tweets', {data: filter})
     .then((response) => {
       console.log(response)
-      const tweetBucket = response.data.data;
-      // setStreams((prevStream) => [...prevStream, tweetBucket]);
-      setStreams((prevStream) => {
-        console.log(prevStream);
-        return {
-          ...prevStream,
-          [response.data.params]: tweetBucket
-        }
-      })
 
+      if (!response.data.data) {
+        setStreams((prevStream) => {
+          console.log(prevStream);
+          return {
+            ...prevStream,
+            [response.data.params]: [{text: 'No Tweets available for this query'}]
+          }
+        })
+      } else {
+        const tweetBucket = response.data.data;
+        // setStreams((prevStream) => [...prevStream, tweetBucket]);
+        setStreams((prevStream) => {
+          console.log(prevStream);
+          return {
+            ...prevStream,
+            [response.data.params]: tweetBucket
+          }
+        })
+      }
       setPrevFilter(response.data.params);
       setFilter({from: '', to: '', mentions: '', hashtag: '', contains: '', retweets: ''});
+
     })
     .catch((error) => {
       console.error(error);

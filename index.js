@@ -14,11 +14,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', express.static(path.join(__dirname, 'client', 'static')));
 
-//app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'client', 'static', 'index.html')); });
-
 app.post('/api/tweets', (req, res) => {
-  // console.log(req);
-  // console.log(req.query);;
   let twitterRecentSearch = 'https://api.twitter.com/2/tweets/search/recent'
   const customParams = req.body.data;
   let paramsToAdd = [];
@@ -31,7 +27,7 @@ app.post('/api/tweets', (req, res) => {
       if (key === 'mentions') {
         // @
         paramsToAdd.push(`@${val}`);
-      } else if (key === 'retweet') {
+      } else if (key === 'retweets') {
         // retweets_of
         paramsToAdd.push(`retweets_of:${val}`);
       } else if (key === 'hashtag') {
@@ -54,15 +50,17 @@ app.post('/api/tweets', (req, res) => {
 
   paramsToAdd = encodeURI(paramsToAdd);
 
-  console.log('query: ' + twitterRecentSearch);
+  console.log('query: ' + paramsToAdd);
 
-  axios.get(twitterRecentSearch, {
+  const query = twitterRecentSearch + '?query=' + paramsToAdd;
+
+  axios.get(query, {
     params: {
-      query: paramsToAdd,
       max_results: 10
     }
   })
   .then((response) => {
+    // console.log(response)
     console.log(response.data);
 
     let responseWithParams = response.data;
@@ -74,31 +72,7 @@ app.post('/api/tweets', (req, res) => {
 
 })
 
-// {
-//   "data": [
-//     {
-//       "id":"1323646013106581504","text":"【バーチャル・VTuber】#P2y\nホロライブ 白上フブキ VTuber史上5人目のYouTubeチャンネル登録者数100万人に迫る\n#hololive #ShirakamiFubuki #VTuber\n#ホロライブ #白上フブキ #フブキch\nhttps://t.co/z9UrczoR1T"
-//     },
-//     {
-//       "id":"1322926802994606080","text":"Unfinished art of Fubuki doing 3 stand rushes at the same time\n\n#fubuki #shirakamifubuki #jojo #JoJosBizarreAdventure #hololive #hololivefanart https://t.co/4LjKQzcQCL"
-//     },
-//     {
-//       "id":"1322525652797607936","text":"RT @shirosefang: Hololife#1 featuring @shirakamifubuki!\n\n#絵フブキ #hololive #shirakamifubuki https://t.co/y1Qv2oqVyX"
-//     },
-//     {
-//       "id":"1322237493207584768","text":"A message from your friendly neighborhood fox:\n\n#hololive #白上フブキ #ShirakamiFubuki #vtuber #VTubers #JustShutupAndWatchIt\n\nhttps://t.co/AMFk5qJBoy"
-//     },
-//     {
-//       "id":"1321865814849527809","text":"RT @Frankpined93: Why does Fubuki not want to be your wife?\n\n#絵フブキ \n#ShirakamiFubuki\n#Hololive\n#holomemes https://t.co/QBjfNlHDg2"
-//     },
-//     {
-//       "id":"1321334203280023553","text":"Callback to her DKC2 stream from last month, but Fubuki talks a little bit about taking it slow. Sometimes, it's better to do things at your own pace and not worry about others!\n\nLink below ⬇️\nhttps://t.co/XSkaeeqOse\n\n#フブ切り #ShirakamiFubuki #VTuberEN"
-//     }
-//   ],
-//   "meta": {
-//     "newest_id":"1323646013106581504","oldest_id":"1321334203280023553","result_count":6
-//   }
-// }
+
 
 // FOR STREAM
 // app.get('/api/tweets', (req, res) => {
